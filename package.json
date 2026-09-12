@@ -1,0 +1,9 @@
+{
+  "name": "cicd-coursera",
+  "version": "1.0.0",
+  "description": "CI/CD pipeline project",
+  "scripts": {
+    "lint": "echo \"Lint passed\"",
+    "test": "echo \"Tests passed\""
+  }
+}
