@@ -1,25 +1,38 @@
+# .tekton/tasks.yml
+# Task 4: cleanup task - wipes the shared workspace before/after the pipeline runs
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: lint
+  name: cleanup
 spec:
+  workspaces:
+    - name: source
   steps:
-    - name: lint
-      image: node:18
+    - name: remove
+      image: alpine:3.19
       script: |
-        #!/bin/sh
-        npm install
-        npm run lint
+        #!/usr/bin/env sh
+        set -e
+        echo "Cleaning workspace: $(workspaces.source.path)"
+        rm -rf $(workspaces.source.path)/*
+        echo "Workspace cleaned."
 ---
+# Task 5: jest test task - installs deps and runs the JS unit test suite
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
-  name: test
+  name: jest-test
 spec:
+  workspaces:
+    - name: source
   steps:
     - name: test
-      image: node:18
+      image: node:18-slim
+      workingDir: $(workspaces.source.path)
       script: |
-        #!/bin/sh
+        #!/usr/bin/env bash
+        set -e
+        echo "Installing dependencies..."
         npm install
-        npm test
+        echo "Running jest test suite..."
+        npx jest --ci --coverage
